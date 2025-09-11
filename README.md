@@ -1,167 +1,185 @@
-<!-- <p align="center">
-<img src="/src/frontend/static/icons/Hipster_HeroLogoMaroon.svg" width="300" alt="Online Boutique" />
-</p> -->
-![Continuous Integration](https://github.com/GoogleCloudPlatform/microservices-demo/workflows/Continuous%20Integration%20-%20Main/Release/badge.svg)
+# Gitops
+## Sumário
+- [Objetivo](/Objetivo)
 
-**Online Boutique** is a cloud-first microservices demo application.  The application is a
-web-based e-commerce app where users can browse items, add them to the cart, and purchase them.
+## Tecnologias Utilizadas 💻
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![YAML](https://img.shields.io/badge/YAML-CB171E?style=for-the-badge&logo=yaml&logoColor=white)
+![Rancher](https://img.shields.io/badge/Rancher-0075A8?style=for-the-badge&logo=rancher&logoColor=white)
+![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=for-the-badge&logo=kubernetes&logoColor=white)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7420?style=for-the-badge&logo=argo&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 
-Google uses this application to demonstrate how developers can modernize enterprise applications using Google Cloud products, including: [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine), [Cloud Service Mesh (CSM)](https://cloud.google.com/service-mesh), [gRPC](https://grpc.io/), [Cloud Operations](https://cloud.google.com/products/operations), [Spanner](https://cloud.google.com/spanner), [Memorystore](https://cloud.google.com/memorystore), [AlloyDB](https://cloud.google.com/alloydb), and [Gemini](https://ai.google.dev/). This application works on any Kubernetes cluster.
+## Objetivo 🎯
+Executar um conjunto de microserviços (Online Boutique) em Kubernetes local usando Rancher Desktop, controlado por GitOps com ArgoCD, a partir de um repositório público no GitHub. 
 
-If you’re using this demo, please **★Star** this repository to show your interest!
+### O que é GitOps?
+GitOps utiliza a base DevOps (containerização, gerenciamento e ambientação em nuvem) utilizando o Git como única fonte para estruturação e aplicação. A prática desse conceito será reconhecida no atual projeto.
 
-**Note to Googlers:** Please fill out the form at [go/microservices-demo](http://go/microservices-demo).
+# Fork e repositório GitHub
 
-## Architecture
+Para o acesso aos microserviços da aplicação, foi realizado um fork (bifurcação) a partir do resporitório público [microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo/). O foco é no arquivo YAML com o seguinte caminho: *release/kubernetes-manifests.yaml*
+O fork tem o objetivo de propor mudanças em um código de outra pessoa, a partir da bifurcação, a adaptações podem ser realizadas. Neste caso, foi utilizad o git para fazer o fork localmente. o fork realizado a partir do repositório público se encontra no caminho [microservices-demo-fork](https://github.com/LuanLindolfo/microservices-demo)
 
-**Online Boutique** is composed of 11 microservices written in different
-languages that talk to each other over gRPC.
+## Instação do git e realização do fork
+A instalação do git foi realizada a partir da documentação do GitDocs para [Configuração do git](https://docs.github.com/pt/get-started/git-basics/set-up-git) que está disponível para Windows, Mac e Linux/Unix, no caso desta aplicação, foi utilizado o git para o sistema operacional Windows.
 
-[![Architecture of
-microservices](/docs/img/architecture-diagram.png)](/docs/img/architecture-diagram.png)
+Após a instalação disponível na [Configuração do git](https://docs.github.com/pt/get-started/git-basics/set-up-git), foi escolhido o nome de usuário e a senha bem como foi feito o link como github para o pull e o push do fork.
 
-Find **Protocol Buffers Descriptions** at the [`./protos` directory](/protos).
+Os comandos utilizados inicialmente também foram advindos do GitDocs, na seção de [Criação de fork de um repositório](https://docs.github.com/pt/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo) onde:
+  - Houve navegação até o diretório [microservices-demo](https://github.com/GoogleCloudPlatform/microservices-demo/)
+  - Foi selecionada a opção de fork (no canto direito superior)
+   <img width="482" height="45" alt="Image" src="https://github.com/user-attachments/assets/39a2b691-6663-443d-94b1-9fc9b54c727e" />
+  - Em seguida, basta editar o nome do repositório onde por padrão são nomeados da mesma forma que o repositório de origem do fork.
+  - É importante copiar apenas o branch main para obter apenas o ramo principal do código.
 
-| Service                                              | Language      | Description                                                                                                                       |
-| ---------------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| [frontend](/src/frontend)                           | Go            | Exposes an HTTP server to serve the website. Does not require signup/login and generates session IDs for all users automatically. |
-| [cartservice](/src/cartservice)                     | C#            | Stores the items in the user's shopping cart in Redis and retrieves it.                                                           |
-| [productcatalogservice](/src/productcatalogservice) | Go            | Provides the list of products from a JSON file and ability to search products and get individual products.                        |
-| [currencyservice](/src/currencyservice)             | Node.js       | Converts one money amount to another currency. Uses real values fetched from European Central Bank. It's the highest QPS service. |
-| [paymentservice](/src/paymentservice)               | Node.js       | Charges the given credit card info (mock) with the given amount and returns a transaction ID.                                     |
-| [shippingservice](/src/shippingservice)             | Go            | Gives shipping cost estimates based on the shopping cart. Ships items to the given address (mock)                                 |
-| [emailservice](/src/emailservice)                   | Python        | Sends users an order confirmation email (mock).                                                                                   |
-| [checkoutservice](/src/checkoutservice)             | Go            | Retrieves user cart, prepares order and orchestrates the payment, shipping and the email notification.                            |
-| [recommendationservice](/src/recommendationservice) | Python        | Recommends other products based on what's given in the cart.                                                                      |
-| [adservice](/src/adservice)                         | Java          | Provides text ads based on given context words.                                                                                   |
-| [loadgenerator](/src/loadgenerator)                 | Python/Locust | Continuously sends requests imitating realistic user shopping flows to the frontend.                                              |
+Ao ser criada a bifurcação, tem que ser clonado o repositório de origem pois mesmo que tenha sido bifurcado, é importante ter os arquivos localmente (para fins de edição e outras ações a serem tomadas a partir do repositório), dessa forma foi utilizado o seguinte esquema com o Github e o Git:
+  - Na seleção "Code" do projeto, copie o HTTPS do projeto
+  - No gitbash insira o comando, no local onde os arquivos deverão ser clonados, ``` git clone ``` com as informações copiadas:
+    ```
+    git clone https://github.com/username/repositório
+    ```
+    Será mostrada uma resposta nessa estrutura:
+    ```
+    $ git clone https://github.com/username/repositório
+    > Cloning into `(repositório)`...
+    > remote: Counting objects: 10, done.
+    > remote: Compressing objects: 100% (8/8), done.
+    > remote: Total 10 (delta 1), reused 10 (delta 1)
+    > Unpacking objects: 100% (10/10), done.
+    ```
+  - Com o mesmo HTTPS copiado, após o primeiro comando no gitbash e no diretório em que o fork está, sincronize o for com o repositório upstream (origem), utilize o comando:
+    ```
+    git remote -v
+    ```
+    Dessa forma, irá aparecer uma resposta como:
+    ```
+    origin  https://github.com/username/seu-fork.git (fetch)
+    origin  https://github.com/username/seu-fork.git (push)
+    ```
+  - Adicione a conexão remota com o upstream para a bifurcação:
+    ```
+    git remote add upstream https://github.com/proprietário-original/repositório-original.git
+    ```
+    Ao inserir o comando novamente, será possível ver o repositório. A resposta ao comando será nessa estrutura:
+    ```
+    $ git remote -v
+    > origin    https://github.com/username/seu-fork.git (fetch)
+    > origin    https://github.com/username/seu-fork.git (push)
+    > upstream  https://github.com/proprietário-original/repositório-original.git (fetch)
+    > upstream  https://github.com/proprietário-original/repositório-original.git (push)
+    ```
 
-## Screenshots
+    Dessa forma, a bifurcação será mantida sincronizada com o repositório upstream (de origem).
+## Kubernetes, cluster e pods
 
-| Home Page                                                                                                         | Checkout Screen                                                                                                    |
-| ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [![Screenshot of store homepage](/docs/img/online-boutique-frontend-1.png)](/docs/img/online-boutique-frontend-1.png) | [![Screenshot of checkout screen](/docs/img/online-boutique-frontend-2.png)](/docs/img/online-boutique-frontend-2.png) |
+É essencial saber que, por se tratar de um subsistema, é importante estar no diretório correto para a instalação das dependências de Kubectl, Minikube e ArgoCD, nese caso, foi utilizado o caminho ``` cd /mnt/c/Users/SeuUsuario/Restante_do_caminho_da_aplicação ```.
 
-## Quickstart (GKE)
+Para a estruturação de kubernetes na aplicação, foram utilizadas as seguintes ferramentas:
+1. [Ubuntu 24.04.1 LTS (WSL)](https://apps.microsoft.com/detail/9NZ3KLHXDJP5?hl=neutral&gl=BR&ocid=pdpshare)
+2. [Rancher Desktop (Para executar e gerir cluster localmente)](https://docs-rancherdesktop-io.translate.goog/getting-started/installation/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc)
+3. [Kubectl (Gerenciador de cluster Kubernetes)](https://kubernetes-io.translate.goog/docs/tasks/tools/install-kubectl-linux/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc#download-binary-linux-0)
+4. [Minikube (Ferramenta de execução de cluster local)](https://minikube.sigs.k8s.io/docs/start/?arch=%2Flinux%2Fx86-64%2Fstable%2Fbinary+download)
+5. [ArgoCD (Ferramenta de entrega contínua para Kubernetes)](https://argo--cd-readthedocs-io.translate.goog/en/stable/getting_started/?_x_tr_sl=en&_x_tr_tl=pt&_x_tr_hl=pt&_x_tr_pto=tc)
 
-1. Ensure you have the following requirements:
-   - [Google Cloud project](https://cloud.google.com/resource-manager/docs/creating-managing-projects#creating_a_project).
-   - Shell environment with `gcloud`, `git`, and `kubectl`.
+Lembrando que é importante ter acesso à internet para o download das pendências necessárias para a aplicação (como imagens e as devidas ferramentas), o teste de conectividade pode ser feito por meio do ping com o servidor do google, que retornará o envio e a verificação de pacotes de dados, com o comando:
+```bash
+  ping google.com
+```
 
-2. Clone the latest major version.
+  A instalação de cada ferramenta encontra-se linkada com as documentações e store disponível de download. É importante que a sequência de instalação seja realizada na ordem estabelecida para o funcionamento correto da aplicação GitOps.
 
-   ```sh
-   git clone --depth 1 --branch v0 https://github.com/GoogleCloudPlatform/microservices-demo.git
-   cd microservices-demo/
-   ```
+  Enfatizando a aplicação do minikube e do ArgoCD,temos a personalização de aplicação para consumo de cada CPU disponibilizada para o cluster, neste caso, para o bom funcionamento do cluster foi utilizado o seguinte comando para start do minikube:
+  ```bash
+  minikube start --driver=docker --cpus=2 --memory=2048mb
+  ```
+  - ``` minikube start ```: Comando que inicia o minikube criando um cluster localmente.
+  - ``` --driver=docker ```: Especifica que o cluster irá ser executado em um container, no caso, estabelece o driver que o minikube usa para o ambiente (docker).
+  - ``` --cpus=2 ```: Define a quantidade de CPU virtual para o o cluster, em caso de ocorrer problema em uma, haverá disponibilidade de outra CPU virtual.
+  - ``` --memory=2048mb ```: Especifica a quantidade de memória alocada para o cluster, neste caso, 2GB.
 
-   The `--depth 1` argument skips downloading git history.
+Em seguida, haverá a construção da estrutura para a aplicação do cluster que deve levar um curto período de tempo a depender de cada máquina e da personalização do start, sendo possível verificar os pods e os namespaces por meio do comando:
+  ```bash
+  minikube kubectl -- get pods -A
+  ```
+  - ``` minikube kubectl ```: Comando que inicia o kubectl por meio do minikube comunicando-se com o cluster localmente.
+  - ``` -- get pods ```: Comando que lista pods.
+  - ``` -A ```: Abreviação do comando ``` --all-namespaces ``` busca todos os pods em todos os namespaces.
 
-3. Set the Google Cloud project and region and ensure the Google Kubernetes Engine API is enabled.
+O resultado da aplicação está bem sucedida quando estiver no padrão:
+  ```bash
+NAMESPACE     NAME                               READY   STATUS    RESTARTS      AGE
+kube-system   coredns-66bc5c9577-gbf6h           1/1     Running   0             43s
+kube-system   coredns-66bc5c9577-z527g           1/1     Running   0             43s
+kube-system   etcd-minikube                      1/1     Running   0             50s
+kube-system   kube-apiserver-minikube            1/1     Running   0             50s
+kube-system   kube-controller-manager-minikube   1/1     Running   0             49s
+kube-system   kube-proxy-z62wd                   1/1     Running   0             44s
+kube-system   kube-scheduler-minikube            1/1     Running   0             50s
+kube-system   storage-provisioner                1/1     Running   1 (10s ago)   48s
+  ```
+### Acessando o ArgoCD localmente
+ Após a aplicação dos pods e dos namespaces em conjunto da construção do cluster, será realizada a aplicação do ArgoCD. A ferramenta tem como objetivo utilizar o modelo GitOps como modelo de aplicação, verificando, sincronizando e atualizando as alterações do repositório (única fonte). Os passos foram os seguinte:
+ 1. Criando o nomespace argocd
+     ```bash
+    kubectl create namespace argocd
+    ```
+ 2. Baixando o arquivo de instalação doArgoCD diretamente do repositório oficial do GitHub
+     ```bash
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    ```
+     - ``` kubectl apply ```: Atualiza os recursos a partir da leitura de um arquivo ou URL
+     - ``` -n argocd ```: Informando o namespace (em caso de não existir, o arquivo d einstalação instalará)
+     - ``` -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml ```: Apontando o caminho do arquivo **install.yaml** YAML com os devidos recursos
+ 3. Verificação do processo
+     ```bash
+    kubectl get pods -n argocd
+    ```
+ 4. Padrão de instalação correta
+     ```bash
+       NAME                                               READY   STATUS              RESTARTS   AGE 
+     argocd-application-controller-0                    1/1     Running               0          17s 
+     argocd-applicationset-controller-cb7958dd7-tlcv5   1/1     Running               0          17s 
+     argocd-dex-server-6b45dfcbb8-456b5                 1/1     Running               0          17s 
+     argocd-notifications-controller-85d8b54b6f-fc2rn   1/1     Running               0          17s 
+     argocd-redis-6596588c7c-wnxn9                      1/1     Running               0          17s 
+     argocd-repo-server-69777f45db-6f78r                1/1     Running               0          17s 
+     argocd-server-577c86bbd8-nrm7z                     1/1     Running               0          17s
+    ```
+5. Acessando o ArgoCD com o comando que direciona o tráfego do serviço argocd-server para a porta 8080 para a máquina na porta 443. Não necessiariamente precisa ser a porta 8080, pode ser uma das portas alcançadas pelo port-forward (1 - 65535)
+   ```bash
+   kubectl port-forward svc/argocd-server -n argocd 8080:443
+    ```
+7. Acessando pelo localhost
+   ```bash
+   https://localhost:8080
+    ```
+  - Para acessar a aplicação basta utilizar o comando para obter a senha:
+     ```bash
+     kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+      ```
+     - ``` kubectl -n argocd get secret argocd-initial-admin-secret ```: Busca no namespace o recurso Secret ```argocd-initial-admin-secret```
+     - ``` -o jsonpath="{.data.password} ```: Consultando e extraindo a saída filtrada apenas com o valor da chave
+     - ``` | base64 -d ```: Usa a saída do comando anterior e encaminha para o próximo
+  
+  Por padrão, o usuário é    ```admin```
+  
+### Acesso à aplicação 
+Na aplicação, será necessário configurar o ArgoCD para uso de monitoramento do repositório do GitHub. Em **New App** basta preencher os campos com as seguintes informações:
+  - Applicationa Name: O nome dado pra aplicação atual é **online-boutique**
+    
+  - Project: Default
+    
+  - Source:
+    - Repository URL: Cole o link do repositório no GitHub
+    - Revision: HEAD como padrão
+    - Path: Caminho para o arquivo YAML, nesse caso, gitops-microservices/k8s
 
-   ```sh
-   export PROJECT_ID=<PROJECT_ID>
-   export REGION=us-central1
-   gcloud services enable container.googleapis.com \
-     --project=${PROJECT_ID}
-   ```
+  - Destination:
+    - Cluster URL: Cluster local
+    - Namespace: Definido como default
+   
+Em seguida, basta criar na opção **Create** e na opção **Sync** para a aplicação dos manifestos no cluster. Em seguida, basta aguardar o status **Healthy** e a aplicação estará sincronizada.
 
-   Substitute `<PROJECT_ID>` with the ID of your Google Cloud project.
-
-4. Create a GKE cluster and get the credentials for it.
-
-   ```sh
-   gcloud container clusters create-auto online-boutique \
-     --project=${PROJECT_ID} --region=${REGION}
-   ```
-
-   Creating the cluster may take a few minutes.
-
-5. Deploy Online Boutique to the cluster.
-
-   ```sh
-   kubectl apply -f ./release/kubernetes-manifests.yaml
-   ```
-
-6. Wait for the pods to be ready.
-
-   ```sh
-   kubectl get pods
-   ```
-
-   After a few minutes, you should see the Pods in a `Running` state:
-
-   ```
-   NAME                                     READY   STATUS    RESTARTS   AGE
-   adservice-76bdd69666-ckc5j               1/1     Running   0          2m58s
-   cartservice-66d497c6b7-dp5jr             1/1     Running   0          2m59s
-   checkoutservice-666c784bd6-4jd22         1/1     Running   0          3m1s
-   currencyservice-5d5d496984-4jmd7         1/1     Running   0          2m59s
-   emailservice-667457d9d6-75jcq            1/1     Running   0          3m2s
-   frontend-6b8d69b9fb-wjqdg                1/1     Running   0          3m1s
-   loadgenerator-665b5cd444-gwqdq           1/1     Running   0          3m
-   paymentservice-68596d6dd6-bf6bv          1/1     Running   0          3m
-   productcatalogservice-557d474574-888kr   1/1     Running   0          3m
-   recommendationservice-69c56b74d4-7z8r5   1/1     Running   0          3m1s
-   redis-cart-5f59546cdd-5jnqf              1/1     Running   0          2m58s
-   shippingservice-6ccc89f8fd-v686r         1/1     Running   0          2m58s
-   ```
-
-7. Access the web frontend in a browser using the frontend's external IP.
-
-   ```sh
-   kubectl get service frontend-external | awk '{print $4}'
-   ```
-
-   Visit `http://EXTERNAL_IP` in a web browser to access your instance of Online Boutique.
-
-8. Congrats! You've deployed the default Online Boutique. To deploy a different variation of Online Boutique (e.g., with Google Cloud Operations tracing, Istio, etc.), see [Deploy Online Boutique variations with Kustomize](#deploy-online-boutique-variations-with-kustomize).
-
-9. Once you are done with it, delete the GKE cluster.
-
-   ```sh
-   gcloud container clusters delete online-boutique \
-     --project=${PROJECT_ID} --region=${REGION}
-   ```
-
-   Deleting the cluster may take a few minutes.
-
-## Additional deployment options
-
-- **Terraform**: [See these instructions](/terraform) to learn how to deploy Online Boutique using [Terraform](https://www.terraform.io/intro).
-- **Istio / Cloud Service Mesh**: [See these instructions](/kustomize/components/service-mesh-istio/README.md) to deploy Online Boutique alongside an Istio-backed service mesh.
-- **Non-GKE clusters (Minikube, Kind, etc)**: See the [Development guide](/docs/development-guide.md) to learn how you can deploy Online Boutique on non-GKE clusters.
-- **AI assistant using Gemini**: [See these instructions](/kustomize/components/shopping-assistant/README.md) to deploy a Gemini-powered AI assistant that suggests products to purchase based on an image.
-- **And more**: The [`/kustomize` directory](/kustomize) contains instructions for customizing the deployment of Online Boutique with other variations.
-
-## Documentation
-
-- [Development](/docs/development-guide.md) to learn how to run and develop this app locally.
-
-## Demos featuring Online Boutique
-
-- [Platform Engineering in action: Deploy the Online Boutique sample apps with Score and Humanitec](https://medium.com/p/d99101001e69)
-- [The new Kubernetes Gateway API with Istio and Anthos Service Mesh (ASM)](https://medium.com/p/9d64c7009cd)
-- [Use Azure Redis Cache with the Online Boutique sample on AKS](https://medium.com/p/981bd98b53f8)
-- [Sail Sharp, 8 tips to optimize and secure your .NET containers for Kubernetes](https://medium.com/p/c68ba253844a)
-- [Deploy multi-region application with Anthos and Google cloud Spanner](https://medium.com/google-cloud/a2ea3493ed0)
-- [Use Google Cloud Memorystore (Redis) with the Online Boutique sample on GKE](https://medium.com/p/82f7879a900d)
-- [Use Helm to simplify the deployment of Online Boutique, with a Service Mesh, GitOps, and more!](https://medium.com/p/246119e46d53)
-- [How to reduce microservices complexity with Apigee and Anthos Service Mesh](https://cloud.google.com/blog/products/application-modernization/api-management-and-service-mesh-go-together)
-- [gRPC health probes with Kubernetes 1.24+](https://medium.com/p/b5bd26253a4c)
-- [Use Google Cloud Spanner with the Online Boutique sample](https://medium.com/p/f7248e077339)
-- [Seamlessly encrypt traffic from any apps in your Mesh to Memorystore (redis)](https://medium.com/google-cloud/64b71969318d)
-- [Strengthen your app's security with Cloud Service Mesh and Anthos Config Management](https://cloud.google.com/service-mesh/docs/strengthen-app-security)
-- [From edge to mesh: Exposing service mesh applications through GKE Ingress](https://cloud.google.com/architecture/exposing-service-mesh-apps-through-gke-ingress)
-- [Take the first step toward SRE with Cloud Operations Sandbox](https://cloud.google.com/blog/products/operations/on-the-road-to-sre-with-cloud-operations-sandbox)
-- [Deploying the Online Boutique sample application on Cloud Service Mesh](https://cloud.google.com/service-mesh/docs/onlineboutique-install-kpt)
-- [Anthos Service Mesh Workshop: Lab Guide](https://codelabs.developers.google.com/codelabs/anthos-service-mesh-workshop)
-- [KubeCon EU 2019 - Reinventing Networking: A Deep Dive into Istio's Multicluster Gateways - Steve Dake, Independent](https://youtu.be/-t2BfT59zJA?t=982)
-- Google Cloud Next'18 SF
-  - [Day 1 Keynote](https://youtu.be/vJ9OaAqfxo4?t=2416) showing GKE On-Prem
-  - [Day 3 Keynote](https://youtu.be/JQPOPV_VH5w?t=815) showing Stackdriver
-    APM (Tracing, Code Search, Profiler, Google Cloud Build)
-  - [Introduction to Service Management with Istio](https://www.youtube.com/watch?v=wCJrdKdD6UM&feature=youtu.be&t=586)
-- [Google Cloud Next'18 London – Keynote](https://youtu.be/nIq2pkNcfEI?t=3071)
-  showing Stackdriver Incident Response Management
-- [Microservices demo showcasing Go Micro](https://github.com/go-micro/demo)
+O acesso à aplicação pode ser feito por meio da porta estabelecida, nesse caso: ```https://localhost:8080```
